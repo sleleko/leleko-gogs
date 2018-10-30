@@ -1,0 +1,46 @@
+version: '3.7'
+
+services:
+ gogs-local:
+ # build: ./gogs
+  image: gogs/gogs
+  restart: always
+  ports:
+   - ${GOGS_SSH_PORT}:22
+   - ${GOGS_HOST_PORT}:3000
+  environment:
+   - RUN_CROND=true
+  volumes:
+   - ./gogs-data:/data
+  depends_on:
+   - db
+ 
+ db:
+ # build: ./db
+  image: mariadb
+  restart: always
+  env_file:
+   - .env
+  environment:
+   MYSQL_DATABASE: ${MARIA_DATABASE}
+   MYSQL_ROOT_PASSWORD: ${MARIA_ROOT_PASSWORD}
+   MYSQL_USER: ${MARIA_USER}
+   MYSQL_PASSWORD: ${MARIA_PASSWORD}
+  ports:
+   - 3306:3306
+
+  volumes:
+   - ./database:/var/lib/mysql
+   - ./mysql_configs:/etc/mysql/conf.d
+
+ phpmyadmin:
+  #build: ./phpadmin
+  image: phpmyadmin/phpmyadmin
+  restart: always
+  ports:
+   - 888:80
+
+volumes:
+ gogs-data:
+ db:
+ mysql_configs:
